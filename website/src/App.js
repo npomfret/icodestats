@@ -7,7 +7,7 @@ import React, {useState} from 'react'
 // https://www.youtube.com/watch?v=P8hT5nDai6A
 // https://github.com/CodingTrain/website/blob/main/Courses/intelligence_learning/session4/toy-neural-network-js/examples/xor/sketch.js
 
-function linearRegression(data) {
+const linearRegression = function linearRegression(data) {
     let xSum = 0;
     let ySum = 0;
 
@@ -32,11 +32,11 @@ function linearRegression(data) {
     const b = yMean - m * xMean;
 
     return {m, b}
-}
+}.toString();
 
 const Doodle = () => {
-    const [data, setData] = useState([
-    ]);
+    const [data, setData] = useState([]);
+    const [functionText, setFunctionText] = useState(linearRegression);
 
     const width = 500;
     const height = 500;
@@ -70,8 +70,14 @@ const Doodle = () => {
         }
 
         if (data.length > 1) {
-            const {m, b} = linearRegression(data);
-            drawLine(m, b);
+            try {
+                let result;
+                eval(`${functionText};\nresult = linearRegression(data)`)
+                const {m, b} = result;
+                drawLine(m, b);
+            } catch (e) {
+                console.error(`cannot draw`, e.message);
+            }
         }
     };
 
@@ -85,11 +91,11 @@ const Doodle = () => {
 
                 mousePressed={p5 => {
                     const x = p5.map(p5.mouseX, 0, width, 0, 1);
-                    if(x < 0 || x > 1)
+                    if (x < 0 || x > 1)
                         return;
 
                     const y = p5.map(p5.mouseY, 0, height, 1, 0);
-                    if(y < 0 || y > 1)
+                    if (y < 0 || y > 1)
                         return;
 
                     const point = p5.createVector(x, y);
@@ -119,7 +125,12 @@ const Doodle = () => {
                                 code
                             </Form.Label>
                             <InputGroup>
-                                <Form.Control as="textarea" rows="3" name="address" onChange={() => console.log('s')}/>
+                                <Form.Control
+                                    as="textarea"
+                                    rows={functionText.split("\n").length}
+                                    onChange={(e) => setFunctionText(e.target.value)}>
+                                    {functionText}
+                                </Form.Control>
                             </InputGroup>
                         </FormGroup>
                     </Form>
