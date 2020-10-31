@@ -37,10 +37,10 @@ const linearRegression = function linearRegression(data) {
 const Doodle = () => {
     const [data, setData] = useState([]);
     const [functionText, setFunctionText] = useState(linearRegression);
-    const [functionOutput, setFunctionOutput] = useState("");
+    const [functionOutput, setFunctionOutput] = useState({});
 
-    const width = 500;
-    const height = 500;
+    const width = 400;
+    const height = 400;
 
     const draw = (p5) => {
 
@@ -85,7 +85,7 @@ const Doodle = () => {
     };
 
     return <Row>
-        <Col>
+        <Col md={3}>
             <span>click to add data points</span>
             <Sketch
                 setup={(p5, canvasParentRef) => {
@@ -113,18 +113,21 @@ const Doodle = () => {
 
         <Col>
             data:
-            <pre>
-                {
-                    data.map(({x, y}, i) => {
-                        return `${i}: ${x},${y}\n`
-                    })
-                }
-            </pre>
+            {
+                data.map(({x, y}, i) => {
+                    return <div key={i}>{i}:
+                        x = <span title={x}>{x.toFixed(2)}</span> y = <span title={y}>{y.toFixed(2)}</span>
+                    </div>
+                })
+            }
         </Col>
 
         <Col>
-            output: {JSON.stringify(functionOutput, null, 2)}
+            <div>output:</div>
+            <pre>{JSON.stringify(functionOutput, null, 2)}</pre>
+        </Col>
 
+        <Col md={5}>
             <Form>
                 <FormGroup>
                     <Form.Label>
