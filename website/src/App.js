@@ -7,32 +7,7 @@ import React, {useState} from 'react'
 // https://www.youtube.com/watch?v=P8hT5nDai6A
 // https://github.com/CodingTrain/website/blob/main/Courses/intelligence_learning/session4/toy-neural-network-js/examples/xor/sketch.js
 
-const linearRegression = function linearRegression(data) {
-    let xSum = 0;
-    let ySum = 0;
-
-    for (let {x, y} of data) {
-        xSum += x;
-        ySum += y;
-    }
-
-    const sampleSize = data.length;
-    const xMean = xSum / sampleSize;
-    const yMean = ySum / sampleSize;
-
-    let num = 0;
-    let den = 0;
-
-    for (let {x, y} of data) {
-        num += (x - xMean) * (y - yMean);
-        den += (x - xMean) * (x - xMean);
-    }
-
-    const m = num / den;
-    const b = yMean - m * xMean;
-
-    return {m, b}
-}.toString();
+const linearRegression = global.linearRegression.toString();
 
 const Doodle = () => {
     const [data, setData] = useState([]);
