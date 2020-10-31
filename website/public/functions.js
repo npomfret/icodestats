@@ -1,4 +1,7 @@
 function linearRegression(data) {
+    // data is an array of points: [ {x, y}... ]
+
+    // step 1: compute the mean for both x and y
     let xSum = 0;
     let ySum = 0;
 

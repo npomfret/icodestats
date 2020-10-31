@@ -57,7 +57,7 @@ const Doodle = () => {
 
                 drawLine(m, b);
             } catch (e) {
-                if(!functionError || e.stack !== functionError.stack)
+                if (!functionError || e.stack !== functionError.stack)
                     setFunctionError(e);
                 // console.error(`cannot draw`, e.message);
             }
@@ -92,19 +92,23 @@ const Doodle = () => {
         </Col>
 
         <Col>
-            data:
-            {
-                data.map(({x, y}, i) => {
-                    return <div key={i}>{i}:
-                        x = <span title={x}>{x.toFixed(2)}</span> y = <span title={y}>{y.toFixed(2)}</span>
-                    </div>
-                })
-            }
+            input data:
+            <div className="bg-light">
+                {
+                    data.map(({x, y}, i) => {
+                        return <div key={i} style={{fontVariant: 'tabular-nums'}}>{i}:
+                            x = <span title={x}>{x.toFixed(2)}</span> y = <span title={y}>{y.toFixed(2)}</span>
+                        </div>
+                    })
+                }
+            </div>
         </Col>
 
         <Col>
-            <div>output:</div>
-            <pre>{JSON.stringify(functionOutput, null, 2)}</pre>
+            <div>function output:</div>
+            <div className="bg-light">
+                <pre>{JSON.stringify(functionOutput, null, 2)}</pre>
+            </div>
         </Col>
 
         <Col md={5}>
@@ -119,7 +123,7 @@ const Doodle = () => {
                             as="textarea"
                             rows={functionText.split("\n").length}
                             onChange={(event) => {
-                                if(functionText !== event.target.value)
+                                if (functionText !== event.target.value)
                                     setFunctionText(event.target.value)
                             }}>
                             {functionText}
