@@ -27,3 +27,27 @@ function linearRegression(data) {
 
     return {m, b}
 }
+
+function gradientDescent(data) {
+    const learningRate = 0.05;
+    const iterations = 100;
+
+    let m = 0;
+    let b = 0;
+
+    let results = [];
+
+    for (let i = 0; i < iterations; i++) {
+        for (let {x, y} of data) {
+            const guess = (m * x) + b;
+            const error = y - guess;
+
+            m = m + (error * x * learningRate);
+            b = b + error * learningRate;
+        }
+
+        results.push({m, b})
+    }
+
+    return results;
+}

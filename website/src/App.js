@@ -2,25 +2,64 @@ import './App.css';
 import Sketch from "react-p5";
 import {Card, Col, Container, Form, FormGroup, InputGroup, Navbar, Row} from 'react-bootstrap';
 import React, {useState} from 'react'
+import _ from 'lodash';
 
 // https://www.youtube.com/watch?v=JvS2triCgOY
 // https://www.youtube.com/watch?v=P8hT5nDai6A
 // https://github.com/CodingTrain/website/blob/main/Courses/intelligence_learning/session4/toy-neural-network-js/examples/xor/sketch.js
 
-const linearRegression = global.linearRegression.toString();
+function _reverse(arr) {
+    const copy = arr.slice();
+    copy.reverse();
+    return copy;
+}
 
-const Doodle = () => {
+const FunctionOutput = ({data}) => {
+    if (Array.isArray(data)) {
+        const copy = _reverse(data);
+        return copy.map((item, i) => {
+            const {m, b} = item;
+            return <div key={i}>{data.length - i}: m: {m.toFixed(4)}, b: {b.toFixed(4)}</div>
+        })
+    } else {
+        const {m, b} = data;
+
+        return <div>m: {m.toFixed(4)}, b: {b.toFixed(4)}</div>
+    }
+}
+const Doodle = ({functionName}) => {
     const [data, setData] = useState([]);
-    const [functionText, setFunctionText] = useState(linearRegression);
+    const [functionText, setFunctionText] = useState(global[functionName].toString());
     const [functionError, setFunctionError] = useState(undefined);
     const [functionOutput, setFunctionOutput] = useState({});
 
     const width = 400;
     const height = 400;
 
+    let result;
+    eval(`${functionText};\nresult = ${functionName}(data)`);
+
+    if (!_.isEqual(functionOutput, result)) {
+        setFunctionOutput(result);
+        setFunctionError(undefined);
+    }
+
+    function drawDataPoints(p5) {
+        for (let i = 0; i < data.length; i++) {
+            const x = p5.map(data[i].x, 0, 1, 0, width);
+            const y = p5.map(data[i].y, 0, 1, height, 0);
+            p5.fill("#87ff5f");
+            p5.stroke("#87ff5f");
+            p5.ellipse(x, y, 8, 8);
+        }
+    }
+
     const draw = (p5) => {
 
         function drawLine(m, b) {
+            p5.background(51);
+            drawDataPoints(p5);
+
             let x1 = 0;
             let y1 = m * x1 + b;
             let x2 = 1;
@@ -36,31 +75,23 @@ const Doodle = () => {
             p5.line(x1, y1, x2, y2);
         }
 
-        p5.background(51);
-
-        for (let i = 0; i < data.length; i++) {
-            const x = p5.map(data[i].x, 0, 1, 0, width);
-            const y = p5.map(data[i].y, 0, 1, height, 0);
-            p5.fill("#87ff5f");
-            p5.stroke("#87ff5f");
-            p5.ellipse(x, y, 8, 8);
-        }
-
         if (data.length > 1) {
             try {
-                let result;
-                eval(`${functionText};\nresult = linearRegression(data)`);
-                setFunctionOutput(result);
-                setFunctionError(undefined);
-
-                const {m, b} = result;
-
-                drawLine(m, b);
+                if (Array.isArray(result)) {
+                    const item = result.shift();
+                    if (item)
+                        drawLine(item.m, item.b);
+                } else {
+                    drawLine(result.m, result.b);
+                }
             } catch (e) {
-                if (!functionError || e.stack !== functionError.stack)
+                if (!_.isEqual(e.stack, functionError.stack))
                     setFunctionError(e);
                 // console.error(`cannot draw`, e.message);
             }
+        } else {
+            p5.background(51);
+            drawDataPoints(p5);
         }
     };
 
@@ -91,24 +122,31 @@ const Doodle = () => {
             />
         </Col>
 
-        <Col>
-            input data:
-            <div className="bg-light">
-                {
-                    data.map(({x, y}, i) => {
-                        return <div key={i} style={{fontVariant: 'tabular-nums'}}>{i}:
-                            x = <span title={x}>{x.toFixed(2)}</span> y = <span title={y}>{y.toFixed(2)}</span>
-                        </div>
-                    })
-                }
-            </div>
-        </Col>
+        <Col md={3}>
+            <Card className="mb-2">
+                <Card.Body>
+                    input data:
 
-        <Col>
-            <div>function output:</div>
-            <div className="bg-light">
-                <pre>{JSON.stringify(functionOutput, null, 2)}</pre>
-            </div>
+                    <div className="bg-light">
+                        {
+                            data.map(({x, y}, i) => {
+                                return <div key={i} style={{fontVariant: 'tabular-nums'}}>{i}:
+                                    x = <span title={x}>{x.toFixed(2)}</span> y = <span title={y}>{y.toFixed(2)}</span>
+                                </div>
+                            })
+                        }
+                    </div>
+                </Card.Body>
+            </Card>
+
+            <Card>
+                <Card.Body>
+                    <div>function output:</div>
+                    <div className="bg-light">
+                        <FunctionOutput data={functionOutput}/>
+                    </div>
+                </Card.Body>
+            </Card>
         </Col>
 
         <Col md={5}>
@@ -125,9 +163,9 @@ const Doodle = () => {
                             onChange={(event) => {
                                 if (functionText !== event.target.value)
                                     setFunctionText(event.target.value)
-                            }}>
-                            {functionText}
-                        </Form.Control>
+                            }}
+                            value={functionText}
+                        />
                     </InputGroup>
 
                     {
@@ -147,7 +185,8 @@ function App() {
             <Navbar.Brand href="#">Navbar</Navbar.Brand>
         </Navbar>
 
-        <Doodle/>
+        {/*<Doodle functionName="linearRegression"/>*/}
+        <Doodle functionName="gradientDescent"/>
 
     </Container>
 }
