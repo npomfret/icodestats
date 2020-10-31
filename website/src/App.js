@@ -12,6 +12,7 @@ const linearRegression = global.linearRegression.toString();
 const Doodle = () => {
     const [data, setData] = useState([]);
     const [functionText, setFunctionText] = useState(linearRegression);
+    const [functionError, setFunctionError] = useState(undefined);
     const [functionOutput, setFunctionOutput] = useState({});
 
     const width = 400;
@@ -48,13 +49,17 @@ const Doodle = () => {
         if (data.length > 1) {
             try {
                 let result;
-                eval(`${functionText};\nresult = linearRegression(data)`)
+                eval(`${functionText};\nresult = linearRegression(data)`);
                 setFunctionOutput(result);
+                setFunctionError(undefined);
+
                 const {m, b} = result;
+
                 drawLine(m, b);
             } catch (e) {
-                setFunctionOutput(e.message);
-                console.error(`cannot draw`, e.message);
+                if(!functionError || e.stack !== functionError.stack)
+                    setFunctionError(e);
+                // console.error(`cannot draw`, e.message);
             }
         }
     };
@@ -108,14 +113,24 @@ const Doodle = () => {
                     <Form.Label>
                         code
                     </Form.Label>
+
                     <InputGroup>
                         <Form.Control
                             as="textarea"
                             rows={functionText.split("\n").length}
-                            onChange={(e) => setFunctionText(e.target.value)}>
+                            onChange={(event) => {
+                                if(functionText !== event.target.value)
+                                    setFunctionText(event.target.value)
+                            }}>
                             {functionText}
                         </Form.Control>
                     </InputGroup>
+
+                    {
+                        functionError && <div className="p2 mt-2 border border-danger">
+                            <pre>{functionError.stack}</pre>
+                        </div>
+                    }
                 </FormGroup>
             </Form>
         </Col>
