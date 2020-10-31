@@ -37,6 +37,7 @@ const linearRegression = function linearRegression(data) {
 const Doodle = () => {
     const [data, setData] = useState([]);
     const [functionText, setFunctionText] = useState(linearRegression);
+    const [functionOutput, setFunctionOutput] = useState("");
 
     const width = 500;
     const height = 500;
@@ -73,9 +74,11 @@ const Doodle = () => {
             try {
                 let result;
                 eval(`${functionText};\nresult = linearRegression(data)`)
+                setFunctionOutput(result);
                 const {m, b} = result;
                 drawLine(m, b);
             } catch (e) {
+                setFunctionOutput(e.message);
                 console.error(`cannot draw`, e.message);
             }
         }
@@ -109,33 +112,34 @@ const Doodle = () => {
         </Col>
 
         <Col>
+            data:
             <pre>
-                {JSON.stringify(data.map(point => {
-                    return {x: point.x, y: point.y}
-                }), null, 2)}
+                {
+                    data.map(({x, y}, i) => {
+                        return `${i}: ${x},${y}\n`
+                    })
+                }
             </pre>
         </Col>
 
         <Col>
-            <Card>
-                <Card.Body>
-                    <Form>
-                        <FormGroup>
-                            <Form.Label>
-                                code
-                            </Form.Label>
-                            <InputGroup>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={functionText.split("\n").length}
-                                    onChange={(e) => setFunctionText(e.target.value)}>
-                                    {functionText}
-                                </Form.Control>
-                            </InputGroup>
-                        </FormGroup>
-                    </Form>
-                </Card.Body>
-            </Card>
+            output: {JSON.stringify(functionOutput, null, 2)}
+
+            <Form>
+                <FormGroup>
+                    <Form.Label>
+                        code
+                    </Form.Label>
+                    <InputGroup>
+                        <Form.Control
+                            as="textarea"
+                            rows={functionText.split("\n").length}
+                            onChange={(e) => setFunctionText(e.target.value)}>
+                            {functionText}
+                        </Form.Control>
+                    </InputGroup>
+                </FormGroup>
+            </Form>
         </Col>
     </Row>
 };
