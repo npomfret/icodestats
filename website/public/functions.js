@@ -1,4 +1,3 @@
-
 function mean(data) {
     let sumX = 0;
     let sumY = 0;
@@ -30,15 +29,15 @@ function linearRegression(data) {
     const xMean = xSum / sampleSize;
     const yMean = ySum / sampleSize;
 
-    let num = 0;
-    let den = 0;
+    let numerator = 0;
+    let denominator = 0;
 
     for (let {x, y} of data) {
-        num += (x - xMean) * (y - yMean);
-        den += (x - xMean) * (x - xMean);
+        numerator += (x - xMean) * (y - yMean);
+        denominator += (x - xMean) * (x - xMean);
     }
 
-    const m = num / den;
+    const m = numerator / denominator;
     const b = yMean - m * xMean;
 
     return {m, b}
@@ -48,9 +47,10 @@ function gradientDescent(
     data,
     learningRate = 0.05,
     iterations = 100,
-    initialGuess = {m: 0, b: 0}) {
+    initialGuess = {m: 0, b: 0}
+) {
 
-    if(data.length < 2)
+    if (data.length < 2)
         return [];
 
     const output = [];

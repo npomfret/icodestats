@@ -52,30 +52,34 @@ const DefaultNavbar = (props) => {
     </Router>
 }
 
+const Table = ({data}) => {
+    const cols = [
+        {
+            accessor: 'id',
+        }
+    ];
+
+    for (let key in data[data.length - 1]) {
+        cols.push({
+            Header: key,
+            accessor: key,
+            Cell: ({value}) => <div title={value} style={{fontVariant: 'tabular-nums'}}>{value === undefined ? '' : parseFloat(value).toFixed(4)}</div>
+        })
+    }
+
+    const rows = data.map((item, i) => {
+        return {id: i, ...item}
+    })
+
+    return rows.length ? <DataTable
+        rowData={rows}
+        columnData={cols}
+    /> : null
+}
+
 const FunctionOutput = ({data}) => {
     if (Array.isArray(data)) {
-        const cols = [
-            {
-                accessor: 'id',
-            }
-        ];
-
-        for(let key in data[data.length - 1]) {
-            cols.push({
-                Header: key,
-                accessor: key,
-                Cell: ({value}) => <div title={value}>{value === undefined ? '' : value.toFixed(4)}</div>
-            })
-        }
-
-        const rows = data.map((item, i) => {
-            return {id: i, ...item}
-        })
-
-        return rows.length ? <DataTable
-            rowData={rows}
-            columnData={cols}
-        /> : null
+        return <Table data={data}/>
     } else {
         const {m, b} = data;
 
@@ -247,13 +251,9 @@ const Doodle = ({functionName}) => {
                     input data:
 
                     <div className="bg-light">
-                        {
-                            data.map(({x, y}, i) => {
-                                return <div className="small" key={i} style={{fontVariant: 'tabular-nums'}}>{i}:
-                                    x = <span title={x}>{x.toFixed(2)}</span> y = <span title={y}>{y.toFixed(2)}</span>
-                                </div>
-                            })
-                        }
+                        <Table data={data.map(({x, y}) => {
+                            return {x, y}
+                        })}/>
                     </div>
                 </Card.Body>
             </Card>
