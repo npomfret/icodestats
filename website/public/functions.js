@@ -35,7 +35,7 @@ function gradientDescent(data, learningRate = 0.05, iterations = 100) {
     let m = 0;
     let b = 0;
 
-    let results = [];
+    const output = [];
 
     for (let i = 0; i < iterations; i++) {
         for (let {x, y} of data) {
@@ -46,8 +46,8 @@ function gradientDescent(data, learningRate = 0.05, iterations = 100) {
             b = b + error * learningRate;
         }
 
-        results.push({m, b})
+        output.push({m, b})
     }
 
-    return results;
+    return output;
 }
