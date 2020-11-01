@@ -9,6 +9,8 @@ import {
 import Sketch from "react-p5";
 import {Card, Col, Container, Form, FormGroup, InputGroup, Navbar, Row, NavDropdown, FormControl, Button} from 'react-bootstrap';
 import _ from 'lodash';
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-javascript";
 
 // https://www.youtube.com/watch?v=JvS2triCgOY
 // https://www.youtube.com/watch?v=P8hT5nDai6A
@@ -191,31 +193,41 @@ const Doodle = ({functionName}) => {
         </Col>
 
         <Col md={5}>
-            <Form>
-                <FormGroup>
-                    <Form.Label>
-                        code
-                    </Form.Label>
+            <Card>
+                <Card.Body>
+                    code:
 
-                    <InputGroup>
-                        <Form.Control
-                            as="textarea"
-                            rows={functionText.split("\n").length}
-                            onChange={(event) => {
-                                if (functionText !== event.target.value)
-                                    setFunctionText(event.target.value)
-                            }}
-                            value={functionText}
-                        />
-                    </InputGroup>
+                    <AceEditor
+                        placeholder="Placeholder Text"
+                        mode="javascript"
+                        theme="monokai"
+                        name="blah2"
+                        fontSize={14}
+                        width={"auto"}
+                        height={800}
+                        showPrintMargin={true}
+                        showGutter={true}
+                        highlightActiveLine={true}
+                        value={functionText}
+                        onChange={(event) => {
+                            if (functionText !== event.target.value)
+                                setFunctionText(event.target.value)
+                        }}
+                        setOptions={{
+                            enableBasicAutocompletion: false,
+                            enableLiveAutocompletion: false,
+                            enableSnippets: false,
+                            showLineNumbers: true,
+                            tabSize: 2,
+                        }}/>
+                </Card.Body>
 
-                    {
-                        functionError && <div className="p2 mt-2 border border-danger">
-                            <pre>{functionError.stack}</pre>
-                        </div>
-                    }
-                </FormGroup>
-            </Form>
+                {
+                    functionError && <div className="p2 mt-2 border border-danger">
+                        <pre>{functionError.stack}</pre>
+                    </div>
+                }
+            </Card>
         </Col>
     </Row>
 };
@@ -228,7 +240,12 @@ function App() {
             <Route exact path="/gradient-descent">
                 <Row className="mb-2">
                     <Col>
-                        <Doodle functionName="gradientDescent"/>
+                        <h4>gradient descent</h4>
+                    </Col>
+                </Row>
+                <Row className="mb-2">
+                    <Col>
+                        <Doodle key='gradientDescent' functionName="gradientDescent"/>
                     </Col>
                 </Row>
             </Route>
@@ -236,7 +253,12 @@ function App() {
             <Route exact path="/linear-regression">
                 <Row className="mb-2">
                     <Col>
-                        <Doodle functionName="linearRegression"/>
+                        <h4>linear regression</h4>
+                    </Col>
+                </Row>
+                <Row className="mb-2">
+                    <Col>
+                        <Doodle key='linearRegression' functionName="linearRegression"/>
                     </Col>
                 </Row>
             </Route>

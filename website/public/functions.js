@@ -28,9 +28,9 @@ function linearRegression(data) {
     return {m, b}
 }
 
-function gradientDescent(data) {
-    const learningRate = 0.05;
-    const iterations = 100;
+function gradientDescent(data, learningRate = 0.05, iterations = 100) {
+    if(data.length < 2)
+        return [];
 
     let m = 0;
     let b = 0;
