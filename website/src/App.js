@@ -1,16 +1,12 @@
 import './App.css';
 import React, {useState} from 'react'
-import {
-    BrowserRouter as Router,
-    Link,
-    Route,
-    Switch
-} from "react-router-dom";
+import {BrowserRouter as Router, Link, Route, Switch} from "react-router-dom";
 import Sketch from "react-p5";
-import {Card, Col, Container, Form, FormGroup, InputGroup, Navbar, Row, NavDropdown, FormControl, Button} from 'react-bootstrap';
+import {Button, Card, Col, Container, Form, FormControl, Navbar, NavDropdown, Row} from 'react-bootstrap';
 import _ from 'lodash';
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-javascript";
+import {useExpanded, useTable} from 'react-table'
 
 // https://www.youtube.com/watch?v=JvS2triCgOY
 // https://www.youtube.com/watch?v=P8hT5nDai6A
@@ -58,17 +54,93 @@ const DefaultNavbar = (props) => {
 
 const FunctionOutput = ({data}) => {
     if (Array.isArray(data)) {
-        const copy = _reverse(data);
-        return copy.map((item, i) => {
-            const {m, b} = item;
-            return <div key={i}>{data.length - i}: m: {m.toFixed(4)}, b: {b.toFixed(4)}</div>
+        const cols = [
+            {
+                accessor: 'id',
+            }
+        ];
+
+        for(let key in data[data.length - 1]) {
+            cols.push({
+                Header: key,
+                accessor: key,
+                Cell: ({value}) => <div title={value}>{value === undefined ? '' : value.toFixed(4)}</div>
+            })
+        }
+
+        const rows = data.map((item, i) => {
+            return {id: i, ...item}
         })
+
+        return rows.length ? <DataTable
+            rowData={rows}
+            columnData={cols}
+        /> : null
     } else {
         const {m, b} = data;
 
         return <div>m: {m.toFixed(4)}, b: {b.toFixed(4)}</div>
     }
 }
+
+const DataTable = ({rowData, columnData, ...otherProps}) => {
+    const {
+        getTableProps,
+        getTableBodyProps,
+        headerGroups,
+        rows,
+        prepareRow,
+        visibleColumns,
+        state: {expanded},
+    } = useTable(
+        {
+            columns: columnData,
+            data: rowData
+        },
+        useExpanded
+    );
+
+    return <table {...getTableProps()} className="border border-dark mt-2 mb-2 flex-fill" {...otherProps}>
+        <thead>
+        {headerGroups.map(headerGroup => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => (
+                    <th
+                        {...column.getHeaderProps()}
+                        className="text-center text-light p-1 border border-dark bg-secondary"
+                        style={{fontSize: 14}}
+                    >
+                        {column.render('Header')}
+                    </th>
+                ))}
+            </tr>
+        ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+        {rows.map(row => {
+            prepareRow(row);
+
+            return <React.Fragment key={row.id}>
+                <tr {...row.getRowProps()}>
+                    {row.cells.map(cell => {
+                        return <td
+                            {...cell.getCellProps()}
+                            className="pl-1 pr-1 pt-0 pb-0"
+                            style={{fontSize: 14, borderRight: '1px solid lightgrey', borderBottom: '1px solid lightgrey'}}
+                        >
+                            {cell.render('Cell')}
+                        </td>
+                    })}
+                </tr>
+
+                {row.isExpanded ? <tr>
+                    <td colSpan={visibleColumns.length}>{row.original.subcomponent()}</td>
+                </tr> : null}
+            </React.Fragment>
+        })}
+        </tbody>
+    </table>
+};
 
 const Doodle = ({functionName}) => {
     const [data, setData] = useState([]);
@@ -125,7 +197,11 @@ const Doodle = ({functionName}) => {
                     if (item)
                         drawLine(item.m, item.b);
                 } else {
-                    drawLine(result.m, result.b);
+                    if (result.m !== undefined && result.b !== undefined) {
+                        drawLine(result.m, result.b);
+                    } else if (result.x !== undefined && result.y !== undefined) {
+                        drawLine(result.x, result.b);
+                    }
                 }
             } catch (e) {
                 if (!_.isEqual(e.stack, functionError.stack))
@@ -173,7 +249,7 @@ const Doodle = ({functionName}) => {
                     <div className="bg-light">
                         {
                             data.map(({x, y}, i) => {
-                                return <div key={i} style={{fontVariant: 'tabular-nums'}}>{i}:
+                                return <div className="small" key={i} style={{fontVariant: 'tabular-nums'}}>{i}:
                                     x = <span title={x}>{x.toFixed(2)}</span> y = <span title={y}>{y.toFixed(2)}</span>
                                 </div>
                             })
@@ -236,6 +312,19 @@ function App() {
     return <DefaultNavbar>
 
         <Switch>
+
+            <Route exact path="/mean">
+                <Row className="mb-2">
+                    <Col>
+                        <h4>mean</h4>
+                    </Col>
+                </Row>
+                <Row className="mb-2">
+                    <Col>
+                        <Doodle key='mean' functionName="mean"/>
+                    </Col>
+                </Row>
+            </Route>
 
             <Route exact path="/gradient-descent">
                 <Row className="mb-2">
