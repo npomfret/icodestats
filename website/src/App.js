@@ -1,7 +1,11 @@
 import './App.css';
-import Sketch from "react-p5";
-import {Card, Col, Container, Form, FormGroup, InputGroup, Navbar, Row} from 'react-bootstrap';
 import React, {useState} from 'react'
+import {
+    BrowserRouter as Router,
+    Link,
+} from "react-router-dom";
+import Sketch from "react-p5";
+import {Card, Col, Container, Form, FormGroup, InputGroup, Navbar, Row, NavDropdown, FormControl, Button} from 'react-bootstrap';
 import _ from 'lodash';
 
 // https://www.youtube.com/watch?v=JvS2triCgOY
@@ -12,6 +16,42 @@ function _reverse(arr) {
     const copy = arr.slice();
     copy.reverse();
     return copy;
+}
+
+const DefaultNavbar = (props) => {
+    return <Router>
+        <Container fluid>
+            <Row>
+                <Col md={12}>
+                    <Navbar bg="light" expand="lg">
+                        <Navbar.Brand as={Link} to="/">
+                            <Navbar.Brand href="#">icodestats.org</Navbar.Brand>
+                        </Navbar.Brand>
+
+                        <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+
+                        <NavDropdown title="stats" id="basic-nav-dropdown" className="mr-auto">
+                            <NavDropdown.Item as={Link} to="#action/3.1">sum</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="#action/3.2">mean</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="#action/3.3">standard deviation</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="#action/3.3">correlation</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="#action/3.3">linear regression</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="#action/3.3">gradient descent</NavDropdown.Item>
+                            <NavDropdown.Divider/>
+                            <NavDropdown.Item as={Link} to="#action/3.4">Separated link</NavDropdown.Item>
+                        </NavDropdown>
+
+                        <Form inline>
+                            <FormControl type="text" placeholder="Search" className="mr-sm-2"/>
+                            <Button variant="outline-success">Search</Button>
+                        </Form>
+                    </Navbar>
+                </Col>
+            </Row>
+
+            {props.children}
+        </Container>
+    </Router>
 }
 
 const FunctionOutput = ({data}) => {
@@ -95,7 +135,7 @@ const Doodle = ({functionName}) => {
         }
     };
 
-    return <Row>
+    return <Row className="pt-2">
         <Col md={3}>
             <span>click to add data points</span>
             <Sketch
@@ -180,15 +220,12 @@ const Doodle = ({functionName}) => {
 };
 
 function App() {
-    return <Container fluid>
-        <Navbar expand="lg" variant="light" bg="light">
-            <Navbar.Brand href="#">Navbar</Navbar.Brand>
-        </Navbar>
+    return <DefaultNavbar>
 
         {/*<Doodle functionName="linearRegression"/>*/}
         <Doodle functionName="gradientDescent"/>
 
-    </Container>
+    </DefaultNavbar>
 }
 
 export default App;
