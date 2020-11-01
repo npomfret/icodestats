@@ -3,6 +3,8 @@ import React, {useState} from 'react'
 import {
     BrowserRouter as Router,
     Link,
+    Route,
+    Switch
 } from "react-router-dom";
 import Sketch from "react-p5";
 import {Card, Col, Container, Form, FormGroup, InputGroup, Navbar, Row, NavDropdown, FormControl, Button} from 'react-bootstrap';
@@ -24,21 +26,19 @@ const DefaultNavbar = (props) => {
             <Row>
                 <Col md={12}>
                     <Navbar bg="light" expand="lg">
-                        <Navbar.Brand as={Link} to="/">
-                            <Navbar.Brand href="#">icodestats.org</Navbar.Brand>
-                        </Navbar.Brand>
+                        <Navbar.Brand as={Link} to="/">icodestats.org</Navbar.Brand>
 
                         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
 
                         <NavDropdown title="stats" id="basic-nav-dropdown" className="mr-auto">
-                            <NavDropdown.Item as={Link} to="#action/3.1">sum</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="#action/3.2">mean</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="#action/3.3">standard deviation</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="#action/3.3">correlation</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="#action/3.3">linear regression</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="#action/3.3">gradient descent</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/sum">sum</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/mean">mean</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/standard-deviation">standard deviation</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/correlation">correlation</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/linear-regression">linear regression</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/gradient-descent">gradient descent</NavDropdown.Item>
                             <NavDropdown.Divider/>
-                            <NavDropdown.Item as={Link} to="#action/3.4">Separated link</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} to="/foo">Separated link</NavDropdown.Item>
                         </NavDropdown>
 
                         <Form inline>
@@ -67,6 +67,7 @@ const FunctionOutput = ({data}) => {
         return <div>m: {m.toFixed(4)}, b: {b.toFixed(4)}</div>
     }
 }
+
 const Doodle = ({functionName}) => {
     const [data, setData] = useState([]);
     const [functionText, setFunctionText] = useState(global[functionName].toString());
@@ -222,8 +223,32 @@ const Doodle = ({functionName}) => {
 function App() {
     return <DefaultNavbar>
 
-        {/*<Doodle functionName="linearRegression"/>*/}
-        <Doodle functionName="gradientDescent"/>
+        <Switch>
+
+            <Route exact path="/gradient-descent">
+                <Row className="mb-2">
+                    <Col>
+                        <Doodle functionName="gradientDescent"/>
+                    </Col>
+                </Row>
+            </Route>
+
+            <Route exact path="/linear-regression">
+                <Row className="mb-2">
+                    <Col>
+                        <Doodle functionName="linearRegression"/>
+                    </Col>
+                </Row>
+            </Route>
+
+            <Route exact path="/*">
+                <Row className="mb-2">
+                    <Col>
+                        todo
+                    </Col>
+                </Row>
+            </Route>
+        </Switch>
 
     </DefaultNavbar>
 }
